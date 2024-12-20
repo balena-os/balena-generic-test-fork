@@ -1,5 +1,68 @@
 {
-	"extends": [
-		"github>balena-os/renovate-config"
-	]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":semanticCommitsDisabled",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "commitMessagePrefix": "Update",
+  "commitMessageAction": "",
+  "commitMessageTopic": "{{depName}}",
+  "commitBody": "Update {{depName}}\nChangelog-entry: Update {{depName}} to {{newVersion}}",
+  "prHourlyLimit": 0,
+  "pruneStaleBranches": true,
+  "git-submodules": {
+    "enabled": true
+  },
+  "labels": ["renovate"],
+  "automerge": true,
+  "automergeStrategy": "merge-commit",
+  "digest": {
+    "commitBody": "Update {{depName}}\nChangelog-entry: Update {{depName}} to {{newDigest}}"
+  },
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["*"],
+      "excludePackagePatterns": [
+        ".*meta-balena",
+        ".*balena-yocto-scripts",
+        ".*leviathan",
+        ".*contracts"
+      ],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["regex"],
+      "enabled": true,
+      "automerge": true
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "enabled": true,
+      "automerge": true
+    },
+    {
+      "matchManagers": ["git-submodules"],
+      "matchPackagePatterns": ["poky", "meta-*"],
+      "matchCurrentValue": "!/^master/",
+      "enabled": true,
+      "automerge": true,
+      "groupName": "meta-layers"
+    },
+    {
+      "matchPackagePatterns": ["meta-tci"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["git-submodules"],
+      "matchDepNames": ["balena-yocto-scripts"],
+      "postUpgradeTasks": {
+        "commands": [
+          "sed -E -i 's/(yocto-build-deploy\\.yml@)[^[:space:]]+$/\\1{{{newDigest}}}/' .github/workflows/*.yml"
+        ],
+        "fileFilters": [".github/workflows/*.yml"],
+        "executionMode": "update"
+      }
+    }
+  ]
 }
