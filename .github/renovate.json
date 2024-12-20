@@ -1,5 +1,5 @@
 {
 	"extends": [
-		"github>balena-os/renovate-config"
+		"https://raw.githubusercontent.com/balena-os/renovate-config/refs/heads/kyle/renovate-yocto-scripts-workflow/default.json"
 	]
 }
